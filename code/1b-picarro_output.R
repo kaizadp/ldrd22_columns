@@ -1,5 +1,13 @@
 ## Picarro Processing Script
 
+## This script cleans the raw Picarro data and extracts CO2/CH4 concentrations (ppm)
+## and computes gas fluxes
+## This script load the {picarro.data} package and `source` additional functions from the picarro_data.R script.
+
+## Code created by BBL
+## edits by KFP, May 2022
+
+
 ####################### #
 ####################### #
 

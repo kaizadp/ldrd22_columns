@@ -1,3 +1,16 @@
+## functions for processing Picarro data
+## NOTE: Do NOT run or edit this script.
+## This script will be `sourced` from the picarro_output.R script.
+
+## Code created by BBL
+## edits by KFP, May 2022
+
+
+############################## #
+############################## #
+
+
+
 # 3-clean_picarro_data.R
 
 # This is just a thin wrapper around two calls to picarro.data package functions
