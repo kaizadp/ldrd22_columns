@@ -117,3 +117,9 @@ ghg_fluxes %>%
   geom_smooth(aes(group = measurement_location))+
   facet_wrap(~column_number) +
   theme(legend.position = "none")
+
+
+
+# 4. export data ----
+ghg_ppm_max %>% write.csv("data/processed/picarro_TestRun_May2022_ppm", row.names = FALSE)
+ghg_fluxes %>% write.csv("data/processed/picarro_TestRun_May2022_flux", row.names = FALSE)
