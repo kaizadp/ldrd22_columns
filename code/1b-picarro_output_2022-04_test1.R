@@ -45,7 +45,7 @@ picarro_raw = sapply(list.files(path = PICARROPATH, pattern = "dat$", recursive 
                      read.table, header=TRUE, simplify = FALSE) %>% bind_rows()  
 
 # clean the Picarro data
-picarro_clean = clean_picarro_data(picarro_raw)
+picarro_clean = clean_picarro_data(picarro_raw %>% mutate(CO2_dry = CO2))
 
 # Match Picarro data with the valve key data
 pcm = match_picarro_data(picarro_clean, valve_key)
