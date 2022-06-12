@@ -62,8 +62,22 @@ ghg_ppm =
   dplyr::select(-Start_datetime, -Stop_datetime) %>% 
   left_join(core_key) %>% 
   dplyr::select(Core, DATETIME, MPVPosition, CH4_dry, CO2_dry, Elapsed_seconds, 
-                Core_assignment)
+                Core_assignment, Sample_number)
 
+
+
+
+ghg_ppm_max = 
+  ghg_ppm %>% 
+  group_by(Core, MPVPosition, Core_assignment, Sample_number) %>% 
+  mutate(CO2_max = CO2_dry == max(CO2_dry)) %>% 
+  filter(CO2_max) %>% 
+  dplyr::select(-CO2_max)
+
+  filter(MPVPosition < 2 & Sample_number < 100)
+
+ghg_ppm_max %>% 
+  distinct(Sample_number)
 
 # compute fluxes
 ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key)
@@ -72,82 +86,20 @@ ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key)
 #
 # 3. make graphs ----
 
-ghg_ppm %>% 
+# ghg_ppm %>% 
+#   ggplot(aes(x = DATETIME, y = CO2_dry))+
+#   geom_point()+
+#   facet_wrap(~Core_assignment)  
+
+
+ghg_ppm_max %>% 
   ggplot(aes(x = DATETIME, y = CO2_dry))+
-  geom_point()+
+  geom_point()+ 
+  geom_line()+
   facet_wrap(~Core_assignment)  
 
-
-
-
-
-
-# ----
-
-
-qc3 = qc_fluxes(ghg_fluxes, valve_key)
-
-gf = 
-  ghg_fluxes %>% 
-  left_join(core_key) %>% 
-  filter(flux_co2_umol_s >= 0) %>% 
-  # remove outliers
-  group_by(Core_assignment) %>% 
-  dplyr::mutate(mean = mean(flux_co2_umol_s),
-                median = median(flux_co2_umol_s),
-                sd = sd(flux_co2_umol_s)) 
-
-
-gf %>% 
+ghg_fluxes %>% 
   ggplot(aes(x = DATETIME, y = flux_co2_umol_s))+
-  geom_point()+
-  facet_wrap(~Core_assignment)
-
-
-
-ungroup %>% 
-  dplyr::mutate(outlier = flux_co2_umol_g_s - mean > 4 * sd)
-
-gf_no_outliers = dplyr::filter(gf, !outlier)
-
-gf_output =
-  subset(merge(gf, valve_key %>% dplyr::select(Core, Start_datetime, Stop_datetime, Treatment)), 
-         DATETIME <= Stop_datetime & DATETIME >= Start_datetime & Core == Core) %>% 
-  dplyr::select(-mean,-median, -sd, -Start_datetime, -Stop_datetime, -outlier)
-
-
-#summarizing  
-cum_flux = 
-  gf_no_outliers %>%
-  group_by(Core) %>% 
-  dplyr::summarise(cum = sum(flux_co2_umol_g_s),
-                   max = max(flux_co2_umol_g_s),
-                   #cumC = sum(flux_co2_umol_gC_s),
-                   #maxC = max(flux_co2_umol_gC_s),
-                   mean = mean(flux_co2_umol_g_s),
-                   #meanC = mean(flux_co2_umol_gC_s),
-                   median = median(flux_co2_umol_g_s),
-                   #medianC = median(flux_co2_umol_gC_s),
-                   sd = sd(flux_co2_umol_g_s),
-                   #sdC = sd(flux_co2_umol_gC_s),
-                   cv = sd/mean,
-                   #cvC = sdC/meanC,
-                   se = sd/sqrt(n()),
-                   n = n()) %>% 
-  left_join(core_key, by = "Core"
-  )
-
-meanflux = 
-  cum_flux %>% 
-  group_by(Site, drying, length) %>% 
-  dplyr::summarize(cum = mean(cum),
-                   max = mean(max),
-                   #cumC = mean(cumC),
-                   #maxC = mean(maxC),
-                   mean = mean(mean),
-                   #meanC = mean(meanC),
-                   median = mean(median),
-                   #medianC = mean(medianC)
-  )
-
-
+  geom_point()+ 
+  geom_line()+
+  facet_wrap(~Core)  
