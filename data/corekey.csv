@@ -15,3 +15,15 @@ ambient,ambient,ambient,ambient,ambient
 10,flask4,4,effluent,static
 11,flask5,5,effluent,static
 12,flask6,6,effluent,static
+P1,rep1,1,soil column,dynamic
+P2,rep2,2,soil column,dynamic
+P3,rep3,3,soil column,dynamic
+P4,rep4,4,soil column,static
+P5,rep5,5,soil column,static
+P6,rep6,6,soil column,static
+P7,flask1,1,effluent,dynamic
+P8,flask2,2,effluent,dynamic
+P9,flask3,3,effluent,dynamic
+P10,flask4,4,effluent,static
+P11,flask5,5,effluent,static
+P12,flask6,6,effluent,static
