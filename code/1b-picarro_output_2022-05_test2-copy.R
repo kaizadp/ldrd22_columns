@@ -25,7 +25,7 @@ source("code/1a-picarro_data.R")
 
 ## set Picarro Path
 # this is the directory where the Picarro data files are being stored
-PICARROPATH = "data/respiration"
+PICARROPATH = "data/respiration/2022/05"
 
 
 #
@@ -45,7 +45,7 @@ picarro_raw = sapply(list.files(path = PICARROPATH, pattern = "dat$", recursive 
                      read.table, header=TRUE, simplify = FALSE) %>% bind_rows()  
 
 # clean the Picarro data
-picarro_clean = clean_picarro_data(picarro_raw)
+picarro_clean = clean_picarro_data(picarro_raw %>% mutate(CO2_dry = CO2))
 
 # Match Picarro data with the valve key data
 pcm = match_picarro_data(picarro_clean, valve_key)
@@ -62,25 +62,47 @@ ghg_ppm =
   dplyr::select(-Start_datetime, -Stop_datetime) %>% 
   left_join(core_key) %>% 
   dplyr::select(Core, DATETIME, MPVPosition, CH4_dry, CO2_dry, Elapsed_seconds, 
-                Core_assignment)
+                Core_assignment, Sample_number) 
 
+
+ghg_ppm_max = 
+  ghg_ppm %>% 
+  filter(MPVPosition < 2 & Sample_number < 300)
+
+ghg_ppm_max %>% 
+  distinct(Sample_number)
+
+
+  group_by(Core, MPVPosition, Core_assignment, Sample_number) %>% 
+  mutate(CO2_max = DATETIME == max(DATETIME)) %>% 
+  filter(CO2_max)
 
 # compute fluxes
-ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key)
+ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key) 
 
 
 #
 # 3. make graphs ----
 
 ghg_ppm %>% 
+#  filter(grepl("rep", Core_assignment)) %>% 
+  filter(Core_assignment == "rep1") %>% 
   ggplot(aes(x = DATETIME, y = CO2_dry))+
-  geom_point()+
+  geom_point()+ 
+  geom_line()+
   facet_wrap(~Core_assignment)  
 
 
+ghg_fluxes %>% 
+  ggplot(aes(x = DATETIME, y = flux_co2_umol_s))+
+  geom_point()+
+  facet_wrap(~Core)  
 
-
-
+ghg_ppm_max %>% 
+  ggplot(aes(x = Elapsed_seconds, y = CO2_dry))+
+  geom_point()+ 
+  geom_line()+
+  facet_wrap(~Sample_number)  
 
 # ----
 

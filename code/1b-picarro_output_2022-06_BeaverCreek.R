@@ -66,16 +66,26 @@ ghg_ppm =
 #                Core_assignment, Sample_number) %>% 
   force()
 
-ghg_ppm_max = 
+ghg_ppm_positive_slope = 
   ghg_ppm %>% 
   group_by(Core, MPVPosition, Core_assignment, Sample_number) %>% 
-  mutate(CO2_max = CO2_dry == max(CO2_dry)) %>% 
-  filter(CO2_max) %>% 
-  dplyr::select(-CO2_max)
+  dplyr::mutate(CO2_max_time = case_when(CO2_dry == max(CO2_dry) ~ DATETIME),
+                CO2_max_time = max(CO2_max_time, na.rm = TRUE),
+                keep = DATETIME <= CO2_max_time) %>% 
+  filter(keep)
+  
+
+pcm_positive_slope = 
+  picarro_clean_matched %>% 
+  group_by(Core, MPVPosition, Sample_number) %>% 
+  dplyr::mutate(CO2_max_time = case_when(CO2_dry == max(CO2_dry) ~ DATETIME),
+                CO2_max_time = max(CO2_max_time, na.rm = TRUE),
+                keep = DATETIME <= CO2_max_time) %>% 
+  filter(keep)
 
 
 # compute fluxes
-ghg_fluxes = compute_ghg_fluxes(picarro_clean_matched, valve_key) %>% 
+ghg_fluxes = compute_ghg_fluxes(pcm_positive_slope, valve_key) %>% 
   left_join(core_key)
 
 
@@ -134,3 +144,14 @@ ghg_fluxes %>%
 # 4. export data ----
 ghg_ppm_max %>% write.csv("data/processed/picarro_BeaverCreek_June2022_ppm", row.names = FALSE)
 ghg_fluxes %>% write.csv("data/processed/picarro_BeaverCreek_June2022_flux", row.names = FALSE)
+
+
+
+
+
+ghg_ppm_positive_slope %>%
+  filter(MPVPosition == 1 & Sample_number < 300) %>% 
+  ggplot(aes(x = Elapsed_seconds, y = CO2_dry))+
+  geom_point()+ 
+  geom_line()+
+  facet_wrap(~Sample_number)  

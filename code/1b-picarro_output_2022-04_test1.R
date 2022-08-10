@@ -74,9 +74,11 @@ ghg_ppm_max =
   filter(CO2_max) %>% 
   dplyr::select(-CO2_max)
 
-  filter(MPVPosition < 2 & Sample_number < 100)
+ghg_ppm_max2 = 
+  ghg_ppm %>% 
+  filter(MPVPosition < 2 & Sample_number < 400)
 
-ghg_ppm_max %>% 
+ghg_ppm_max2 %>% 
   distinct(Sample_number)
 
 # compute fluxes
@@ -103,3 +105,10 @@ ghg_fluxes %>%
   geom_point()+ 
   geom_line()+
   facet_wrap(~Core)  
+
+
+ghg_ppm_max2 %>% 
+  ggplot(aes(x = Elapsed_seconds, y = CO2_dry))+
+  geom_point()+ 
+  geom_line()+
+  facet_wrap(~Sample_number)  
