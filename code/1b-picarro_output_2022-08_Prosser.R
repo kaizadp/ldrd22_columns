@@ -105,7 +105,7 @@ ghg_ppm_max %>%
   labs(title = "Prosser",
        y = "CO2, ppm",
        color = "column number",
-       caption = "preliminary graph, prepared 2022/08/20")+
+       caption = "preliminary graph, prepared 2022/08/22")+
   facet_wrap(~treatment)+
   theme(legend.position = "top")
 
@@ -144,12 +144,12 @@ ghg_fluxes %>%
   labs(title = "Prosser",
        y = "CO2 flux, μmol/s",       
        color = "column number",
-       caption = "preliminary graph, prepared 2022/08/20")+
+       caption = "preliminary graph, prepared 2022/08/22")+
   theme(legend.position = "none")
 
 # 4. export data ----
-ghg_ppm_max %>% write.csv("data/processed/picarro_Prosser_Aug20_2022_ppm.csv", row.names = FALSE)
-ghg_fluxes %>% write.csv("data/processed/picarro_Prosser_Aug20_2022_flux.csv", row.names = FALSE)
+ghg_ppm_max %>% write.csv("data/processed/picarro_Prosser_Aug22_2022_ppm.csv", row.names = FALSE)
+ghg_fluxes %>% write.csv("data/processed/picarro_Prosser_Aug22_2022_flux.csv", row.names = FALSE)
 
 
 
