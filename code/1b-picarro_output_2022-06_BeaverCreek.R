@@ -83,6 +83,12 @@ pcm_positive_slope =
                 keep = DATETIME <= CO2_max_time) %>% 
   filter(keep)
 
+ghg_ppm_max = 
+  ghg_ppm_positive_slope %>% 
+  group_by(Core, MPVPosition, Core_assignment, Sample_number) %>% 
+  mutate(CO2_max = CO2_dry == max(CO2_dry)) %>% 
+  filter(CO2_max) %>% 
+  dplyr::select(-CO2_max)
 
 # compute fluxes
 ghg_fluxes = compute_ghg_fluxes(pcm_positive_slope, valve_key) %>% 
